@@ -1,139 +1,170 @@
 swagger: "2.0"
 info:
   version: 1.0.0
-  title: CC
-  description: A sample API that uses a petstore as an example to demonstrate features in the swagger-2.0 specification
-  termsOfService: http://swagger.io/terms/
+  title: CG API
+  description: ConceptGroup mobile applications API
+  #termsOfService: http://swagger.io/terms/
   contact:
-    name: Swagger API Team
-    email: foo@example.com
-    url: http://madskristensen.net
+    name: 2Nova Team
+    email: vad@2nova.ru
+    url: http://2nova.ru
   license:
     name: MIT
     url: http://github.com/gruntjs/grunt/blob/master/LICENSE-MIT
-host: petstore.swagger.io
-basePath: /api
+host: acoolakids.ru
+basePath: /app
 schemes:
-  - http
+  - https
 consumes:
   - application/json
+  - application/x-www-form-urlencoded
+  - multipart/form-data
 produces:
   - application/json
+
 paths:
-  /pets:
-    get:
-      description: |
-        Returns all pets from the system that the user has access to
-        Nam sed condimentum est. Maecenas tempor sagittis sapien, nec rhoncus sem sagittis sit amet. Aenean at gravida augue, ac iaculis sem. Curabitur odio lorem, ornare eget elementum nec, cursus id lectus. Duis mi turpis, pulvinar ac eros ac, tincidunt varius justo. In hac habitasse platea dictumst. Integer at adipiscing ante, a sagittis ligula. Aenean pharetra tempor ante molestie imperdiet. Vivamus id aliquam diam. Cras quis velit non tortor eleifend sagittis. Praesent at enim pharetra urna volutpat venenatis eget eget mauris. In eleifend fermentum facilisis. Praesent enim enim, gravida ac sodales sed, placerat id erat. Suspendisse lacus dolor, consectetur non augue vel, vehicula interdum libero. Morbi euismod sagittis libero sed lacinia.
-        Sed tempus felis lobortis leo pulvinar rutrum. Nam mattis velit nisl, eu condimentum ligula luctus nec. Phasellus semper velit eget aliquet faucibus. In a mattis elit. Phasellus vel urna viverra, condimentum lorem id, rhoncus nibh. Ut pellentesque posuere elementum. Sed a varius odio. Morbi rhoncus ligula libero, vel eleifend nunc tristique vitae. Fusce et sem dui. Aenean nec scelerisque tortor. Fusce malesuada accumsan magna vel tempus. Quisque mollis felis eu dolor tristique, sit amet auctor felis gravida. Sed libero lorem, molestie sed nisl in, accumsan tempor nisi. Fusce sollicitudin massa ut lacinia mattis. Sed vel eleifend lorem. Pellentesque vitae felis pretium, pulvinar elit eu, euismod sapien.
-      operationId: findPets
-      parameters:
-        - name: tags
-          in: query
-          description: tags to filter by
-          required: false
-          type: array
-          collectionFormat: csv
-          items:
-            type: string
-        - name: limit
-          in: query
-          description: maximum number of results to return
-          required: false
-          type: integer
-          format: int32
-      responses:
-        200:
-          description: pet response
-          schema:
-            type: array
-            items:
-              $ref: '#/definitions/Pet'
-        default:
-          description: unexpected error
-          schema:
-            $ref: '#/definitions/Error'
+  /user/auth:
     post:
-      description: Creates a new pet in the store.  Duplicates are allowed
-      operationId: addPet
+      description: Authenticate user with credentials
+      operationId: userAuth
       parameters:
         - name: pet
           in: body
           description: Pet to add to the store
           required: true
           schema:
-            $ref: '#/definitions/NewPet'
+            $ref: '#/definitions/AuthRequest'
+        # - name: credentials
+        #   in: body
+        #   required: true
+        #   schema:
+        #     $ref: '#/definitions/AuthRequest'
+          # type: string
+          # format: email
+        # - name: password
+        #   in: formData
+        #   required: true
+        #   type: string
+          # format: password
       responses:
-        200:
-          description: pet response
+        201:
+          description: success
           schema:
-            $ref: '#/definitions/Pet'
-        default:
-          description: unexpected error
+            $ref: '#/definitions/AuthResponse'
+        401:
+          description: auth error
           schema:
             $ref: '#/definitions/Error'
-  /pets/{id}:
-    get:
-      description: Returns a user based on a single ID, if the user does not have access to the pet
-      operationId: find pet by id
-      parameters:
-        - name: id
-          in: path
-          description: ID of pet to fetch
-          required: true
-          type: integer
-          format: int64
-      responses:
-        200:
-          description: pet response
+          examples:
+            application/json:
+              error: api.auth.credentials.failed
+              errno: 401
+        422:
+          description: form validation error
           schema:
-            $ref: '#/definitions/Pet'
-        default:
-          description: unexpected error
-          schema:
-            $ref: '#/definitions/Error'
-    delete:
-      description: deletes a single pet based on the ID supplied
-      operationId: deletePet
-      parameters:
-        - name: id
-          in: path
-          description: ID of pet to delete
-          required: true
-          type: integer
-          format: int64
-      responses:
-        204:
-          description: pet deleted
-        default:
-          description: unexpected error
-          schema:
-            $ref: '#/definitions/Error'
+            $ref: '#/definitions/FormError'
+          examples:
+            application/json:
+                error: api.request.validation.failed
+                errno: 0
+                mapping:
+                  password: 
+                    - This value should not be blank.
+        500:
+           description: unexpected error
+           schema:
+             $ref: '#/definitions/Error'
+
 definitions:
-  Pet:
-    allOf:
-      - $ref: '#/definitions/NewPet'
-      - required:
-        - id
-        properties:
-          id:
-            type: integer
-            format: int64
-  NewPet:
+  UserModel:
     required:
-      - name
+      - id
+      - firstName
+      - lastName
+      - middleName
+      - isBlacklisted
+      - isSubscribed
+      - lastActivity
     properties:
-      name:
-        type: string
-      tag:
-        type: string
-  Error:
-    required:
-      - code
-      - message
-    properties:
-      code:
+      id:
         type: integer
         format: int32
-      message:
+        default: 100500
+      firstName:
         type: string
+        default: Vasya
+      lastName:
+        type: string
+        default: Pupkin
+      middleName:
+        type: string
+        default: ''
+      isBlacklisted:
+        type: boolean
+      isSubscribed:
+        type: boolean
+      lastActivity:
+        type: string
+        format: date-time
+        default: '2016-11-08T18:33:20+03:00'
+
+  AuthModel:
+    required:
+      - token
+    properties:
+      token:
+        description: JWT token
+        type: string
+        default: 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJ1aWQiOjc3ODQ2LCJpYXQiOjE0Nzg2ODk2NzN9.hKYuKjA5KbXV27ibs_XgqN9fz9zow1xia1jmLHCwk4ItJ59Qti78BsquOoXZK6WmpoU2dJvyquhsu2svO-mNmA'
+
+  AuthResponse:
+    type: object
+    required:
+      - user
+      - auth
+    properties:
+      user:
+        $ref: '#/definitions/UserModel'
+      auth:
+        $ref: '#/definitions/AuthModel'
+
+  AuthRequest:
+    required:
+      - email
+      - password
+    properties:
+      email:
+        type: string
+        # format: email
+        default: ask@me.ru
+      password:
+        type: string
+        # format: password
+        default: UsErPasSW0rDIsNOtEmpTy
+
+  # HTTP 400+
+  Error:
+    required:
+      - error
+      - errno
+    properties:
+      error:
+        type: string
+      errno:
+        type: integer
+        format: int32
+  # HTTP 422
+  FormError:
+    required:
+      - error
+      - errno
+      - mapping
+    properties:
+      error:
+        type: string
+      errno:
+        type: integer
+        format: int32
+        default: 0
+      mapping:
+        type: array
