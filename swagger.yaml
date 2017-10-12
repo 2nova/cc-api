@@ -34,6 +34,146 @@ paths:
             type: array
             items:
               $ref: '#/definitions/CountriesResponse'
+  
+  /favorite/getfavoritecount:
+    post:
+      description: Get count of favorite goods user's favorite goods token
+      operationId: getFavoriteCount
+      parameters:
+        - name: uniqueToken
+          in: body
+          description: User uniqueToken
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Count of active favorite goods
+          schema:
+            type: integer
+        401:
+          description: User not authenticated by token
+          schema:
+            $ref: '#/definitions/Error'
+          examples:
+            application/json:
+                error: api.auth.required
+                errno: 401
+        500:
+          description: unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+
+  /favorite/setfavoritegood:
+    post:
+      description: add specified good to favorite
+      operationId: addToFavorite
+      parameters:
+        - name: data
+          in: body
+          description: user credentials
+          required: true
+          schema:
+            $ref: '#/definitions/UserFavoriteGoodRequest'
+      responses:
+        200:
+          description: Good succefuly added to favorite goods collection
+        208:
+          description: Good already added to favorite goods collection
+        401:
+          description: User not authenticated by token
+          schema:
+            $ref: '#/definitions/Error'
+          examples:
+            application/json:
+                error: api.auth.required
+                errno: 401
+        500:
+          description: unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    delete:
+      description: delete specified good from favorite
+      operationId: deleteFromFavorite
+      parameters:
+        - name: data
+          in: body
+          description: user credentials
+          required: true
+          schema:
+            $ref: '#/definitions/UserFavoriteGoodRequest'
+      responses:
+        200:
+          description: Good succefuly removed from favorite goods
+        401:
+          description: User not authenticated by token
+          schema:
+            $ref: '#/definitions/Error'
+          examples:
+            application/json:
+                error: api.auth.required
+                errno: 401
+        422:
+          description: good not found in user collection
+        500:
+          description: unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+
+  /favorite/removeallfavoritegood:
+    delete:
+      description: Remove all goods from favorite goods for specified user
+      operationId: getFavoriteCount
+      parameters:
+        - name: uniqueToken
+          in: body
+          description: User uniqueToken
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: User favorite goods collection succefull clear
+        401:
+          description: User not authenticated by token
+          schema:
+            $ref: '#/definitions/Error'
+          examples:
+            application/json:
+                error: api.auth.required
+                errno: 401
+        500:
+          description: unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+
+  /favorite/showuniqtokenpage:
+    post:
+      description: return all active goods in user's favorite collection
+      operationId: getFavoriteGoods
+      parameters:
+        - name: uniqueToken
+          in: body
+          description: User uniqueToken
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: User favorite goods collection
+        401:
+          description: User not authenticated by token
+          schema:
+            $ref: '#/definitions/Error'
+          examples:
+            application/json:
+                error: api.auth.required
+                errno: 401
+        500:
+          description: unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+
   /user/auth:
     post:
       description: Authenticate user with credentials
@@ -589,7 +729,16 @@ definitions:
         type: string
       newPassword:
         type: string
-        
+  
+  UserFavoriteGoodRequest:
+    required:
+      - token
+      - goodId
+    properties:
+      goodId:
+        type: integer
+      token:
+        type: integer
   
   RegisterViaOauthToken:
     required:
