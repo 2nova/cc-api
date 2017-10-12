@@ -266,6 +266,95 @@ paths:
             application/json:
                 error: api.auth.required
                 errno: 401
+  /user/provider/vk:
+    post:
+      description: Register & authenticate user with vk provider
+      operationId: userVkAutethicate
+      parameters:
+      - name: data
+        in: body
+        description: Token
+        required: true
+        schema:
+          $ref: '#/definitions/RegisterViaOauthToken'
+      responses:
+        201:
+          description: User authenticated
+          schema:
+            $ref: '#/definitions/AuthResponse'
+        206:
+          description: For finish user registration need send user email to 'user/advanced_register'
+        500:
+           description: unexpected error
+           schema:
+             $ref: '#/definitions/Error'
+
+  /user/provider/facebook:
+    post:
+      description: Register & authenticate user with facebook provider
+      operationId: userFacebookAutethicate
+      parameters:
+      - name: data
+        in: body
+        description: facebook token
+        required: true
+        schema:
+            $ref: '#/definitions/RegisterViaOauthToken'
+      responses:
+        201:
+          description: User authenticated
+          schema:
+            $ref: '#/definitions/AuthResponse'
+        206:
+          description: For finish user registration need send user email to 'user/advanced_register'
+        500:
+           description: unexpected error
+           schema:
+             $ref: '#/definitions/Error'
+
+  /user/advanced_register:
+      post:
+        description: Get user email for complete user register via facebook or vk
+        operationId: userAdditionalRegister
+        parameters:
+        - name: email
+          in: body
+          description: User email
+          required: true
+          schema:
+            $ref: '#/definitions/RegisterRequest'
+        responses:
+          201:
+            description: User registered
+            schema:
+              $ref: '#/definitions/AuthResponse'
+          409:
+            description: User email already in use
+            schema:
+              $ref: '#/definitions/FormError'
+            examples:
+              application/json:
+                  error: api.request.validation.failed
+                  errno: 0
+                  mapping:
+                    email:
+                      - This already in use.
+          422:
+            description: form validation error
+            schema:
+              $ref: '#/definitions/FormError'
+            examples:
+              application/json:
+                  error: api.request.validation.failed
+                  errno: 0
+                  mapping:
+                    email:
+                      - This value should not be blank.
+          500:
+             description: unexpected error
+             schema:
+               $ref: '#/definitions/Error'
+
 
 definitions:
   CountriesResponse:
@@ -499,6 +588,14 @@ definitions:
       oldPassword:
         type: string
       newPassword:
+        type: string
+        
+  
+  RegisterViaOauthToken:
+    required:
+      - token
+    properties:
+      token:
         type: string
   
   # HTTP 400+
