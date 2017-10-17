@@ -355,8 +355,8 @@ paths:
 
   /user/addresses:
     get:
-      description: Get user address
-      operationId: userGetAddress
+      description: Get list of User addresses
+      operationId: userGetAddresses
       parameters:
         - name: Authorization
           in: header
@@ -365,7 +365,7 @@ paths:
           default: Bearer <token>
       responses:
         200:
-          description: User addresses
+          description: List of User addresses
           schema:
             type: array
             items:
@@ -379,6 +379,35 @@ paths:
                 error: api.auth.required
                 errno: 401
 
+  /user/address:
+    post:
+      description: Create user address
+      operationId: userCreateAddress
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          type: string
+          default: Bearer <token>
+        - name: data
+          in: body
+          description: Token
+          required: true
+          schema:
+            $ref: '#/definitions/UserAddressRequest'          
+      responses:
+        201:
+          description: User address created
+          schema:
+            $ref: '#/definitions/UserAddressResponse'
+        401:
+          description: User not authenticated by token
+          schema:
+            $ref: '#/definitions/Error'
+          examples:
+            application/json:
+                error: api.auth.required
+                errno: 401
   /user/address/{id}:
     delete:
       description: Delete user address
@@ -394,7 +423,7 @@ paths:
           description: ID of user address
           required: true
           type: integer
-          format: int32
+          minimum: 1
       responses:
         204:
           description: User address deleted
@@ -406,6 +435,157 @@ paths:
             application/json:
                 error: api.auth.required
                 errno: 401
+    get:
+      description: Get User address
+      operationId: userGetAddress
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          type: string
+          default: Bearer <token>
+        - name: id
+          in: path
+          description: ID of user address
+          required: true
+          type: integer
+          minimum: 1
+      responses:
+        200:
+          description: User address
+          schema:
+            $ref: '#/definitions/UserAddressResponse'
+        401:
+          description: User not authenticated by token
+          schema:
+            $ref: '#/definitions/Error'
+          examples:
+            application/json:
+                error: api.auth.required
+                errno: 401
+    put:
+      description: Update user address
+      operationId: userUpdateAddress
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          type: string
+          default: Bearer <token>
+        - name: id
+          in: path
+          description: ID of user address
+          required: true
+          type: integer
+          minimum: 1
+        - name: data
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/UserAddressRequest'          
+      responses:
+        200:
+          description: User address updated
+          schema:
+            $ref: '#/definitions/UserAddressResponse'
+        401:
+          description: User not authenticated by token
+          schema:
+            $ref: '#/definitions/Error'
+          examples:
+            application/json:
+                error: api.auth.required
+                errno: 401
+  /user/deliveryByAddressId/{id}:
+    get:
+      description: Delivery info by User address
+      operationId: userDeliveryByAddressId
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          type: string
+          default: Bearer <token>
+        - name: id
+          in: path
+          description: ID of user address
+          required: true
+          type: integer
+          minimum: 1
+      responses:
+        200:
+          description: List of Delivery Services
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/DeliveryResponse'
+        401:
+          description: User not authenticated by token
+          schema:
+            $ref: '#/definitions/Error'
+          examples:
+            application/json:
+                error: api.auth.required
+                errno: 401
+
+  /user/orders:
+    get:
+      description: List of short User orders
+      operationId: userOrders
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          type: string
+          default: Bearer <token>
+      responses:
+        200:
+          description: List of short User orders
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/OrderShortResponse'
+        401:
+          description: User not authenticated by token
+          schema:
+            $ref: '#/definitions/Error'
+          examples:
+            application/json:
+                error: api.auth.required
+                errno: 401
+
+  /user/order/{id}:
+    get:
+      description: List of short User orders
+      operationId: userOrders
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          type: string
+          default: Bearer <token>
+        - name: id
+          in: path
+          description: ID of user address
+          required: true
+          type: integer
+          minimum: 1
+      responses:
+        200:
+          description: Order extended info
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/OrderExtendedResponse'
+        401:
+          description: User not authenticated by token
+          schema:
+            $ref: '#/definitions/Error'
+          examples:
+            application/json:
+                error: api.auth.required
+                errno: 401
+
   /user/provider/vk:
     post:
       description: Register & authenticate user with vk provider
@@ -453,47 +633,274 @@ paths:
              $ref: '#/definitions/Error'
 
   /user/advanced_register:
-      post:
-        description: Get user email for complete user register via facebook or vk
-        operationId: userAdditionalRegister
-        parameters:
-        - name: email
+    post:
+      description: Get user email for complete user register via facebook or vk
+      operationId: userAdditionalRegister
+      parameters:
+      - name: email
+        in: body
+        description: User email
+        required: true
+        schema:
+          $ref: '#/definitions/RegisterRequest'
+      responses:
+        201:
+          description: User registered
+          schema:
+            $ref: '#/definitions/AuthResponse'
+        409:
+          description: User email already in use
+          schema:
+            $ref: '#/definitions/FormError'
+          examples:
+            application/json:
+                error: api.request.validation.failed
+                errno: 0
+                mapping:
+                  email:
+                    - This already in use.
+        422:
+          description: form validation error
+          schema:
+            $ref: '#/definitions/FormError'
+          examples:
+            application/json:
+                error: api.request.validation.failed
+                errno: 0
+                mapping:
+                  email:
+                    - This value should not be blank.
+        500:
+           description: unexpected error
+           schema:
+             $ref: '#/definitions/Error'
+
+  /cart:
+    get:
+      description: Get ShoppingCart
+      operationId: cartGet
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          type: string
+          default: Bearer <token>
+      responses:
+        200:
+          description: ShoppingCart object
+          schema:
+            $ref: '#/definitions/CartResponse'
+        401:
+          description: User not authenticated by token
+          schema:
+            $ref: '#/definitions/Error'
+          examples:
+            application/json:
+                error: api.auth.required
+                errno: 401
+    delete:
+      description: Clear ShoppingCart
+      operationId: cartClear
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          type: string
+          default: Bearer <token>
+      responses:
+        204:
+          description: ShoppingCart cleard
+          schema:
+            $ref: '#/definitions/CartResponse'
+        401:
+          description: User not authenticated by token
+          schema:
+            $ref: '#/definitions/Error'
+          examples:
+            application/json:
+                error: api.auth.required
+                errno: 401
+
+  /cart/item:
+    post:
+      description: Create Cart Item
+      operationId: cartItemCreate
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          type: string
+          default: Bearer <token>
+        - name: data
           in: body
-          description: User email
           required: true
           schema:
-            $ref: '#/definitions/RegisterRequest'
-        responses:
-          201:
-            description: User registered
-            schema:
-              $ref: '#/definitions/AuthResponse'
-          409:
-            description: User email already in use
-            schema:
-              $ref: '#/definitions/FormError'
-            examples:
-              application/json:
-                  error: api.request.validation.failed
-                  errno: 0
-                  mapping:
-                    email:
-                      - This already in use.
-          422:
-            description: form validation error
-            schema:
-              $ref: '#/definitions/FormError'
-            examples:
-              application/json:
-                  error: api.request.validation.failed
-                  errno: 0
-                  mapping:
-                    email:
-                      - This value should not be blank.
-          500:
-             description: unexpected error
-             schema:
-               $ref: '#/definitions/Error'
+            required:
+              - goodId
+              - size
+              - qty
+            properties:
+              goodId:
+                type: integer
+                minimum: 1
+              size:
+                type: string
+              qty:
+                type: integer
+                minimum: 1
+                maximum: 9
+      responses:
+        201:
+          description: ShoppingCart object
+          schema:
+            $ref: '#/definitions/CartResponse'
+        401:
+          description: User not authenticated by token
+          schema:
+            $ref: '#/definitions/Error'
+          examples:
+            application/json:
+                error: api.auth.required
+                errno: 401
+
+  /cart/item/{id}:
+    delete:
+      description: Delete ShoppingCart Item
+      operationId: cartItemDelete
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          type: string
+          default: Bearer <token>
+        - name: id
+          in: path
+          description: ID of user address
+          required: true
+          type: integer
+          minimum: 1
+      responses:
+        200:
+          description: ShoppingCart Item deleted
+          schema:
+            $ref: '#/definitions/CartResponse'
+        401:
+          description: User not authenticated by token
+          schema:
+            $ref: '#/definitions/Error'
+          examples:
+            application/json:
+                error: api.auth.required
+                errno: 401
+    put:
+      description: Update ShoppingCart Item
+      operationId: cartItemDelete
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          type: string
+          default: Bearer <token>
+        - name: id
+          in: path
+          description: ID of user address
+          required: true
+          type: integer
+          minimum: 1
+        - name: data
+          in: body
+          required: true
+          schema:
+            required:
+              - size
+              - qty
+            properties:
+              size:
+                type: string
+              qty:
+                type: integer
+                minimum: 1
+                maximum: 9
+      responses:
+        200:
+          description: ShoppingCart Item updated
+          schema:
+            $ref: '#/definitions/CartResponse'
+        401:
+          description: User not authenticated by token
+          schema:
+            $ref: '#/definitions/Error'
+          examples:
+            application/json:
+                error: api.auth.required
+                errno: 401
+
+  /cart/order:
+    post:
+      description: Create Order 
+      operationId: cartOrder
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          type: string
+          default: Bearer <token>
+        - name: data
+          in: body
+          required: true
+          schema:
+            required:
+              - addressId
+              - deliveryType
+              - paymentType
+              - items
+            properties:
+              addressId:
+                type: integer
+                minimum: 1
+              deliveryType:
+                type: string
+              paymentType:
+                type: string
+              discountCoupon:
+                type: string
+              items:
+                type: array
+                items:
+                  required:
+                    - goodId
+                    - size
+                    - qty
+                    - price
+                  properties:
+                    goodId:
+                      type: integer
+                      minimum: 1
+                    size:
+                      type: string
+                    qty:
+                      type: integer
+                      minimum: 1
+                      maximum: 9
+                    price:
+                      description: one item price
+                      type: integer
+                      minimum: 1
+                      maximum: 9999
+                    
+      responses:
+        201:
+          description: Created Order 
+          schema:
+            $ref: '#/definitions/OrderExtendedResponse'
+        401:
+          description: User not authenticated by token
+          schema:
+            $ref: '#/definitions/Error'
+          examples:
+            application/json:
+                error: api.auth.required
+                errno: 401
 
 
 definitions:
@@ -507,7 +914,7 @@ definitions:
     properties:
       id:
         type: integer
-        format: int32
+        minimum: 1
       title:
         type: string
       phoneCode:
@@ -528,7 +935,7 @@ definitions:
     properties:
       id:
         type: integer
-        format: int32
+        minimum: 1
       title:
         type: string
       cities:
@@ -542,7 +949,7 @@ definitions:
     properties:
       id:
         type: integer
-        format: int64
+        minimum: 1
       title:
         type: string
 
@@ -558,8 +965,7 @@ definitions:
     properties:
       id:
         type: integer
-        format: int32
-        default: 100500
+        minimum: 1
       firstName:
         type: string
         default: Vasya
@@ -668,6 +1074,49 @@ definitions:
       subscribe:
         type: boolean
         
+  UserAddressRequest:
+    required:
+      - firstName
+      - middleName
+      - lastName
+      - phoneCode
+      - phoneNumber
+      - regionId
+      - cityId
+      - postalCode
+      - street
+      - house
+      - structure
+      - room
+    properties:
+      firstName:
+        type: string
+      middleName:
+        type: string
+      lastName:
+        type: string
+      phoneCode:
+        type: string
+        default: 7
+      phoneMask:
+        type: string
+        default: (999) 999-99-99
+      regionId:
+        type: integer
+        minimum: 1
+      cityId:
+        type: integer
+        minimum: 1
+      postalCode:
+        type: string
+      street:
+        type: string
+      house:
+        type: string
+      structure:
+        type: string
+      room:
+        type: string
   UserAddressResponse:
     required:
       - id
@@ -688,7 +1137,7 @@ definitions:
     properties:
       id:
         type: integer
-        format: int32
+        minimum: 1
       firstName:
         type: string
       middleName:
@@ -701,12 +1150,12 @@ definitions:
         type: string
       regionId:
         type: integer
-        format: int32
+        minimum: 1
       regionName:
         type: string
       cityId:
         type: integer
-        format: int32
+        minimum: 1
       cityName:
         type: string
       postalCode:
@@ -737,9 +1186,275 @@ definitions:
     properties:
       goodId:
         type: integer
+        minimum: 1
       token:
         type: integer
   
+  DeliveryResponse:
+    required:
+      - type
+      - title
+      - cost
+      - days
+      - logo
+    properties:
+      type:
+        type: string
+      title:
+        type: string
+      cost:
+        type: integer
+        minimum: 1
+        maximum: 99999
+      days:
+        type: integer
+        minimum: 1
+        maximum: 20
+      logo:
+        type: string
+        format: uri
+  
+  OrderDeliveryResponse:
+    required:
+      - type
+      - title
+      - cost
+      - days
+      - logo
+      - address
+      - phone
+    properties:
+      type:
+        type: string
+      title:
+        type: string
+      cost:
+        type: integer
+        minimum: 1
+        maximum: 99999
+      days:
+        type: integer
+        minimum: 1
+        maximum: 20
+      logo:
+        type: string
+        format: uri
+      address:
+        type: string
+      phone:
+        type: string
+
+  OrderStatus:
+    required:
+      - id
+      - title
+    properties:
+      id:
+        type: integer
+        minimum: 1
+        maximum: 8
+      title:
+        type: string
+  
+  FromSite:
+    required:
+      - id
+      - slug
+    properties:
+      id:
+        type: integer
+        minimum: 1
+      slug:
+        type: string
+        minLength: 5
+        maxLength: 7 
+  
+  OrderShortResponse:
+    required:
+      - id
+      - sum
+      - status
+      - fromSite
+      - createdAt
+    properties:
+      id:
+        type: integer
+        minimum: 1
+      sum:
+        type: integer
+        minimum: 1
+        maximum: 99999
+      status:
+        $ref: '#/definitions/OrderStatus'
+      fromSite:
+        $ref: '#/definitions/FromSite'
+      createdAt:
+        type: string
+        format: date-time
+      
+  OrderExtendedResponse:
+    required:
+      - id
+      - sum
+      - status
+      - fromSite
+      - createdAt
+      - delivery
+      - payment
+      - items
+    properties:
+      id:
+        type: integer
+        minimum: 1
+      sum:
+        type: integer
+        minimum: 1
+        maximum: 99999
+      status:
+        $ref: '#/definitions/OrderStatus'
+      fromSite:
+        $ref: '#/definitions/FromSite'
+      createdAt:
+        type: string
+        format: date-time
+      delivery:
+        $ref: '#/definitions/OrderDeliveryResponse'
+      payment:
+        type: object
+        required:
+          - type
+        properties:
+          type:
+            type: string
+      items:
+        type: array
+        items:
+          $ref: '#/definitions/OrderItemExtendedResponse'
+
+  OrderItemExtendedResponse:
+    required:
+      - fromSite
+      - good
+      - size
+      - qty
+      - price
+      - sum
+    properties:
+      fromSite:
+        $ref: '#/definitions/FromSite'
+      good:
+        $ref: '#/definitions/Good'
+      size:
+        type: string
+      qty:
+        type: integer
+        minimum: 1
+        maximum: 9
+      price:
+        type: integer
+        minimum: 1
+        maximum: 9999
+      sum:
+        type: integer
+        minimum: 1
+        maximum: 99999
+
+  Good:
+    required:
+      - id
+      - title
+      - article
+      - color
+      - price
+      - oldPrice
+    properties:
+      id:
+        type: integer
+        minimum: 1
+      title:
+        type: string
+      article:
+        type: string
+      color:
+        type: string
+      price:
+        type: integer
+        minimum: 1
+        maximum: 9999
+      oldPrice:
+        type: integer
+        minimum: 0
+        maximum: 9999
+
+  CartItem:
+    required:
+      - id
+      - good
+      - price
+      - qty
+      - size
+      - fromSite
+      - discount
+      - expiresAt
+      - createdAt
+      - updatedAt
+    properties:
+      id:
+        type: integer
+        minimum: 1
+      good:
+        $ref: '#/definitions/Good'
+      price:
+        type: integer
+        minimum: 1
+      qty:
+        type: integer
+        minimum: 1
+        maximum: 9
+      size:
+        type: string
+      fromSite:
+        $ref: '#/definitions/FromSite'
+      discount:
+        type: object
+        required:
+          - mask
+          - titles
+        properties:
+          mask:
+            type: integer
+            minimum: 0
+          titles:
+            type: array
+            items:
+              type: string
+            minItems: 0
+            maxItems: 4
+            uniqueItems: true
+      createdAt:
+        type: string
+        format: date-time
+      updatedAt:
+        type: string
+        format: date-time
+      expiresAt:
+        type: string
+        format: date-time
+
+  CartResponse:
+    required:
+      - discountCoupon
+      #- returnCoupon
+      - items
+    properties:
+      discountCoupon:
+        type: string
+      items:
+        type: array
+        items:
+          $ref: '#/definitions/CartItem'
+
+        
   RegisterViaOauthToken:
     required:
       - token
