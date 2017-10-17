@@ -40,12 +40,11 @@ paths:
       description: Get count of favorite goods user's favorite goods token
       operationId: getFavoriteCount
       parameters:
-        - name: uniqueToken
-          in: body
-          description: User uniqueToken
+        - name: Authorization
+          in: header
           required: true
-          schema:
-            type: integer
+          type: string
+          default: Bearer <token>
       responses:
         200:
           description: Count of active favorite goods
@@ -64,14 +63,19 @@ paths:
           schema:
             $ref: '#/definitions/Error'
 
-  /favorite/setfavoritegood:
+  /favorite/createfavoritegood:
     post:
       description: add specified good to favorite
       operationId: addToFavorite
       parameters:
-        - name: data
+        - name: Authorization
+          in: header
+          required: true
+          type: string
+          default: Bearer <token>
+        - name: goodId
           in: body
-          description: user credentials
+          description: good id
           required: true
           schema:
             $ref: '#/definitions/UserFavoriteGoodRequest'
@@ -92,10 +96,16 @@ paths:
           description: unexpected error
           schema:
             $ref: '#/definitions/Error'
+  /favorite/deletefavoritegood:
     delete:
       description: delete specified good from favorite
       operationId: deleteFromFavorite
       parameters:
+        - name: Authorization
+          in: header
+          required: true
+          type: string
+          default: Bearer <token>
         - name: data
           in: body
           description: user credentials
@@ -125,12 +135,11 @@ paths:
       description: Remove all goods from favorite goods for specified user
       operationId: getFavoriteCount
       parameters:
-        - name: uniqueToken
-          in: body
-          description: User uniqueToken
+        - name: Authorization
+          in: header
           required: true
-          schema:
-            type: integer
+          type: string
+          default: Bearer <token>
       responses:
         200:
           description: User favorite goods collection succefull clear
@@ -147,17 +156,16 @@ paths:
           schema:
             $ref: '#/definitions/Error'
 
-  /favorite/showuniqtokenpage:
+  /favorite/getfavoritegoods:
     post:
       description: return all active goods in user's favorite collection
       operationId: getFavoriteGoods
       parameters:
-        - name: uniqueToken
-          in: body
-          description: User uniqueToken
+        - name: Authorization
+          in: header
           required: true
-          schema:
-            type: integer
+          type: string
+          default: Bearer <token>
       responses:
         200:
           description: User favorite goods collection
