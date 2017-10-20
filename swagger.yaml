@@ -101,7 +101,7 @@ paths:
           schema:
             $ref: '#/definitions/Error'
     
-  /favorite/goodlist:
+  /favorite/items:
     get:
       description: return all active goods in user's favorite collection
       operationId: getFavoriteList
@@ -878,6 +878,52 @@ paths:
             application/json:
                 error: api.auth.required
                 errno: 401
+  /cart/items:
+    get:
+      description: Get ShoppingCart items
+      operationId: cartGetItems
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          type: string
+          default: Bearer <token>
+      responses:
+        200:
+          description: ShoppingCart items collection
+          schema:
+            $ref: '#/definitions/CartResponse'
+        401:
+          description: User not authenticated by token
+          schema:
+            $ref: '#/definitions/Error'
+          examples:
+            application/json:
+                error: api.auth.required
+                errno: 401
+    delete:
+      description: Clear ShoppingCart items colection
+      operationId: cartClearItems
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          type: string
+          default: Bearer <token>
+      responses:
+        204:
+          description: ShoppingCart cleard
+          schema:
+            $ref: '#/definitions/CartResponse'
+        401:
+          description: User not authenticated by token
+          schema:
+            $ref: '#/definitions/Error'
+          examples:
+            application/json:
+                error: api.auth.required
+                errno: 401
+
 
 definitions:
   CountriesResponse:
