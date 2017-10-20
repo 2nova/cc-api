@@ -878,32 +878,7 @@ paths:
             application/json:
                 error: api.auth.required
                 errno: 401
-  /cart/list:
-    get:
-      description: return all goods in user's shopping cart
-      operationId: getCartList
-      parameters:
-        - name: Authorization
-          in: header
-          required: true
-          type: string
-          default: Bearer <token>
-      responses:
-        200:
-          description: User shopping cart collection
-        401:
-          description: User not authenticated by token
-          schema:
-            $ref: '#/definitions/Error'
-          examples:
-            application/json:
-                error: api.auth.required
-                errno: 401
-        500:
-          description: unexpected error
-          schema:
-            $ref: '#/definitions/Error'
-    
+
 definitions:
   CountriesResponse:
     required:
