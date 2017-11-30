@@ -721,16 +721,12 @@ paths:
             required:
               - goodId
               - size
-              - qty
             properties:
               goodId:
                 type: integer
                 minimum: 1
               size:
                 type: string
-              qty:
-                type: integer
-                minimum: 1
       responses:
         201:
           description: ShoppingCart items
