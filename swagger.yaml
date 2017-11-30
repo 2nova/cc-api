@@ -11,7 +11,7 @@ info:
   license:
     name: MIT
     url: http://github.com/gruntjs/grunt/blob/master/LICENSE-MIT
-host: acoolakids.ru
+host: www.conceptclub.ru
 basePath: /app
 schemes:
   - https
@@ -654,7 +654,7 @@ paths:
 
   /cart:
     get:
-      description: Get ShoppingCart
+      description: Get ShoppingCart items
       operationId: cartGet
       parameters:
         - name: Authorization
@@ -664,7 +664,7 @@ paths:
           default: Bearer <token>
       responses:
         200:
-          description: ShoppingCart object
+          description: ShoppingCart items
           schema:
             $ref: '#/definitions/CartResponse'
         401:
@@ -687,8 +687,6 @@ paths:
       responses:
         204:
           description: ShoppingCart cleard
-          schema:
-            $ref: '#/definitions/CartResponse'
         401:
           description: User not authenticated by token
           schema:
@@ -725,10 +723,9 @@ paths:
               qty:
                 type: integer
                 minimum: 1
-                maximum: 9
       responses:
         201:
-          description: ShoppingCart object
+          description: ShoppingCart items
           schema:
             $ref: '#/definitions/CartResponse'
         401:
@@ -752,13 +749,13 @@ paths:
           default: Bearer <token>
         - name: id
           in: path
-          description: ID of user address
+          description: ID of cart item
           required: true
           type: integer
           minimum: 1
       responses:
         200:
-          description: ShoppingCart Item deleted
+          description: ShoppingCart Item deleted - return renew array 
           schema:
             $ref: '#/definitions/CartResponse'
         401:
@@ -788,19 +785,15 @@ paths:
           in: body
           required: true
           schema:
-            required:
-              - size
-              - qty
             properties:
               size:
                 type: string
               qty:
                 type: integer
                 minimum: 1
-                maximum: 9
       responses:
         200:
-          description: ShoppingCart Item updated
+          description: ShoppingCart Item updated - return new shopping cart items
           schema:
             $ref: '#/definitions/CartResponse'
         401:
@@ -878,52 +871,6 @@ paths:
             application/json:
                 error: api.auth.required
                 errno: 401
-  /cart/items:
-    get:
-      description: Get ShoppingCart items
-      operationId: cartGetItems
-      parameters:
-        - name: Authorization
-          in: header
-          required: true
-          type: string
-          default: Bearer <token>
-      responses:
-        200:
-          description: ShoppingCart items collection
-          schema:
-            $ref: '#/definitions/CartResponse'
-        401:
-          description: User not authenticated by token
-          schema:
-            $ref: '#/definitions/Error'
-          examples:
-            application/json:
-                error: api.auth.required
-                errno: 401
-    delete:
-      description: Clear ShoppingCart items colection
-      operationId: cartClearItems
-      parameters:
-        - name: Authorization
-          in: header
-          required: true
-          type: string
-          default: Bearer <token>
-      responses:
-        204:
-          description: ShoppingCart cleard
-          schema:
-            $ref: '#/definitions/CartResponse'
-        401:
-          description: User not authenticated by token
-          schema:
-            $ref: '#/definitions/Error'
-          examples:
-            application/json:
-                error: api.auth.required
-                errno: 401
-
 
 definitions:
   CountriesResponse:
