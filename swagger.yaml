@@ -54,6 +54,8 @@ paths:
       responses:
         200:
           description: Good succefuly added to favorite goods collection
+          schema:
+            $ref: '#/definitions/FavoriteResponse'
         208:
           description: Good already added to favorite goods collection
         401:
@@ -86,6 +88,8 @@ paths:
       responses:
         200:
           description: Good succefuly removed from favorite goods
+          schema:
+            $ref: '#/definitions/FavoriteResponse'
         401:
           description: User not authenticated by token
           schema:
@@ -114,6 +118,8 @@ paths:
       responses:
         200:
           description: User favorite goods collection
+          schema:
+            $ref: '#/definitions/FavoriteResponse'
         401:
           description: User not authenticated by token
           schema:
@@ -136,7 +142,7 @@ paths:
           type: string
           default: Bearer <token>
       responses:
-        200:
+        204:
           description: User favorite goods collection succefull clear
         401:
           description: User not authenticated by token
