@@ -35,7 +35,7 @@ paths:
             items:
               $ref: '#/definitions/CountriesResponse'
   #5610
-  /favorite/good:
+  /favorite/item:
     post:
       description: add specified good to favorite
       operationId: addToFavorite
