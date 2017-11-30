@@ -35,7 +35,7 @@ paths:
             items:
               $ref: '#/definitions/CountriesResponse'
   #5610
-  /favorite/good/{goodId}:
+  /favorite/good:
     post:
       description: add specified good to favorite
       operationId: addToFavorite
@@ -45,19 +45,21 @@ paths:
           required: true
           type: string
           default: Bearer <token>
-        - name: goodId
-          in: path
-          description: ID of good
+        - name: data
+          in: body
           required: true
-          type: integer
-          minimum: 0
+          schema:
+            required:
+              - goodId
+            properties:
+              goodId:
+                type: integer
+                minimum: 1
       responses:
         200:
           description: Good succefuly added to favorite goods collection
           schema:
             $ref: '#/definitions/FavoriteResponse'
-        208:
-          description: Good already added to favorite goods collection
         401:
           description: User not authenticated by token
           schema:
@@ -70,6 +72,8 @@ paths:
           description: unexpected error
           schema:
             $ref: '#/definitions/Error'
+    
+  /favorite/item/{itemId}:
     delete:
       description: delete specified good from favorite
       operationId: deleteFromFavorite
@@ -79,9 +83,9 @@ paths:
           required: true
           type: string
           default: Bearer <token>
-        - name: goodId
+        - name: itemId
           in: path
-          description: ID of good
+          description: ID favorite item
           required: true
           type: integer
           minimum: 0
@@ -98,8 +102,6 @@ paths:
             application/json:
                 error: api.auth.required
                 errno: 401
-        422:
-          description: good not found in user collection
         500:
           description: unexpected error
           schema:
@@ -1433,7 +1435,6 @@ definitions:
     required:
       - id
       - good
-      - price
       - fromSite
     properties:
       id:
@@ -1452,8 +1453,7 @@ definitions:
         type: array
         items:
           $ref: '#/definitions/FavoriteItem'
-          
-        
+
   RegisterViaOauthToken:
     required:
       - token
