@@ -838,16 +838,31 @@ paths:
                 type: string
               discountCoupon:
                 type: string
+              pickpoint:
+                type: array
+                items:
+                  required:
+                    - postamat_id
+                    - address
+                    - phone
+                  properties:
+                    postamat_id:
+                      type: integer
+                      minimum: 1
+                    address:
+                      type: string
+                    phone:
+                      type: string
               items:
                 type: array
                 items:
                   required:
-                    - goodId
+                    - itemId
                     - size
                     - qty
                     - price
                   properties:
-                    goodId:
+                    itemId:
                       type: integer
                       minimum: 1
                     size:
